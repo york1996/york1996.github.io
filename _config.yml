@@ -102,4 +102,6 @@ theme: Chic
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
-  type: ''
+  type: git
+  repo: https://github.com/york1996/york1996.github.io
+  branch: gh-pages
