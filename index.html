@@ -13,7 +13,7 @@
     <meta name="subtitle" content="York1996">
 
 
-    <meta name="description" content="技术|产品|摄影|移动互联网|XR|人工智能|元宇宙|Web3.0">
+    <meta name="description" content="新宇同学的个人主页">
 
 
 
@@ -52,148 +52,109 @@
 
 <body>
     <script>
-        // this function is used to check current theme before page loaded.
+        // Check current theme before page loaded
         (() => {
             const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
             const isDark = currentTheme === 'dark';
-            const pagebody = document.getElementsByTagName('body')[0]
+            const pagebody = document.getElementsByTagName('body')[0];
+            const mobileToggleTheme = document.getElementById("mobile-toggle-theme");
+            
             if (isDark) {
                 pagebody.classList.add('dark-theme');
-                // mobile
-                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+                if (mobileToggleTheme) {
+                    mobileToggleTheme.innerText = "· Dark";
+                }
             } else {
                 pagebody.classList.remove('dark-theme');
-                // mobile
-                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+                if (mobileToggleTheme) {
+                    mobileToggleTheme.innerText = "· Light";
+                }
             }
         })();
     </script>
 
     <div class="wrapper">
         <header>
-    <nav class="navbar">
-        <div class="container">
-            <div class="navbar-header header-logo"><a href="/">新宇同学</a></div>
-            <div class="menu navbar-right">
-                
-                    <a class="menu-item" href="/archives">Posts</a>
-                
-                    <a class="menu-item" href="/category">Categories</a>
-                
-                    <a class="menu-item" href="/tag">Tags</a>
-                
-                    <a class="menu-item" href="/about">About</a>
-                
-                <input id="switch_default" type="checkbox" class="switch_default">
-                <label for="switch_default" class="toggleBtn"></label>
-            </div>
-        </div>
-    </nav>
-
-    
-    <nav class="navbar-mobile" id="nav-mobile">
-        <div class="container">
-            <div class="navbar-header">
-                <div>
-                    <a href="/">新宇同学</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+            <nav class="navbar">
+                <div class="container">
+                    <div class="navbar-header header-logo">
+                        <a href="/">新宇同学</a>
+                    </div>
+                    <div class="menu navbar-right">
+                        <!-- <a class="menu-item" href="/archives">Posts</a>
+                        <a class="menu-item" href="/category">Categories</a>
+                        <a class="menu-item" href="/tag">Tags</a> -->
+                        <a class="menu-item" href="/about">About</a>
+                        <input id="switch_default" type="checkbox" class="switch_default">
+                        <label for="switch_default" class="toggleBtn"></label>
+                    </div>
                 </div>
-                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
-            </div>
-            <div class="menu" id="mobile-menu">
-                
-                    <a class="menu-item" href="/archives">Posts</a>
-                
-                    <a class="menu-item" href="/category">Categories</a>
-                
-                    <a class="menu-item" href="/tag">Tags</a>
-                
-                    <a class="menu-item" href="/about">About</a>
-                
-            </div>
-        </div>
-    </nav>
+            </nav>
 
-</header>
-<script>
-    var mobileBtn = function f() {
-        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
-        var mobileMenu = document.getElementById("mobile-menu");
-        if(toggleMenu.classList.contains("active")){
-           toggleMenu.classList.remove("active")
-            mobileMenu.classList.remove("active")
-        }else{
-            toggleMenu.classList.add("active")
-            mobileMenu.classList.add("active")
-        }
-    }
-</script>
-            <div class="main">
-                
-    <div class="container profile-container">
-    <div class="intro">
-        <div class="avatar">
-            <a href="/archives"><img src="/image/avatar.jpeg"></a>
-        </div>
-        <div class="nickname">新宇同学 | York1996</div>
-        <div class="description"><p>非典型程序员，正在探索更多可能。<br>智能座舱 | HMI | 多媒体 | 移动互联网 | Web3.0 | 元宇宙</p>
-</div>
-        <div class="links">
-            
-                
-                    <a class="link-item" title="Blog" href="/archives">
-                        
-                        
-                            <i class="iconfont icon-blog"></i>
-                        
-                    </a>
-                
-                    <a class="link-item" title="Gallery" target="_blank" rel="noopener" href="https://yorkzhang.lofter.com/">
-                        
-                        
-                            <i class="iconfont icon-gallery"></i>
-                        
-                    </a>
-                
-                    <a class="link-item" title="LinkedIn" target="_blank" rel="noopener" href="https://www.linkedin.com/in/york1996/">
-                        
-                        
+            <nav class="navbar-mobile" id="nav-mobile">
+                <div class="container">
+                    <div class="navbar-header">
+                        <div>
+                            <a href="/">新宇同学</a>
+                            <a id="mobile-toggle-theme">·&nbsp;Light</a>
+                        </div>
+                        <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+                    </div>
+                    <div class="menu" id="mobile-menu">
+                        <!-- <a class="menu-item" href="/archives">Posts</a>
+                        <a class="menu-item" href="/category">Categories</a>
+                        <a class="menu-item" href="/tag">Tags</a> -->
+                        <a class="menu-item" href="/about">About</a>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <script>
+            var mobileBtn = function f() {
+                var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+                var mobileMenu = document.getElementById("mobile-menu");
+                if (toggleMenu.classList.contains("active")) {
+                    toggleMenu.classList.remove("active");
+                    mobileMenu.classList.remove("active");
+                } else {
+                    toggleMenu.classList.add("active");
+                    mobileMenu.classList.add("active");
+                }
+            }
+        </script>
+        <div class="main">
+            <div class="container profile-container">
+                <div class="intro">
+                    <div class="avatar">
+                        <a href="/archives">
+                            <img src="/image/avatar.jpeg" alt="Avatar">
+                        </a>
+                    </div>
+                    <div class="nickname">新宇同学 | York1996</div>
+                    <div class="description">
+                        <p>相信 AI 改变世界</p>
+                    </div>
+                    <div class="links">
+                        <a class="link-item" title="LinkedIn" target="_blank" rel="noopener" href="https://www.linkedin.com/in/york1996/">
                             <i class="iconfont icon-linkedin"></i>
-                        
-                    </a>
-                
-                    <a class="link-item" title="Instagram" target="_blank" rel="noopener" href="https://www.instagram.com/yorkzhang1996/">
-                        
-                        
-                            <i class="iconfont icon-instagram"></i>
-                        
-                    </a>
-                
-                    <a class="link-item" title="Weibo" target="_blank" rel="noopener" href="https://weibo.com/u/1650920051">
-                        
-                        
+                        </a>
+                        <a class="link-item" title="Weibo" target="_blank" rel="noopener" href="https://weibo.com/u/1650920051">
                             <i class="iconfont icon-weibo"></i>
-                        
-                    </a>
-                
-                    <a class="link-item" title="Github" target="_blank" rel="noopener" href="https://github.com/york1996">
-                        
-                        
+                        </a>
+                        <a class="link-item" title="Github" target="_blank" rel="noopener" href="https://github.com/york1996">
                             <i class="iconfont icon-github"></i>
-                        
-                    </a>
-                
-            
-        </div>
-    </div>
-</div>
-
-
+                        </a>
+                    </div>
+                </div>
             </div>
-            <footer id="footer" class="footer">
-    <div class="copyright">
-        <span>© 张新宇 | York1996.com | <a href="https://beian.miit.gov.cn/" target="_blank">粤ICP备16079882号</a></span>
-    </div>
-</footer>
+        </div>
+
+        <footer id="footer" class="footer">
+            <div class="copyright">
+                <span>© 张新宇 | York1996.com</span>
+            </div>
+        </footer>
 
     </div>
 </body>
