@@ -15,16 +15,6 @@
         }
     };
 
-    // Update mobile theme toggle text after header is loaded
-    function updateMobileThemeToggle() {
-        const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
-        const isDark = currentTheme === 'dark';
-        const mobileToggleTheme = document.getElementById("mobile-toggle-theme");
-        if (mobileToggleTheme) {
-            mobileToggleTheme.innerText = isDark ? "· Dark" : "· Light";
-        }
-    }
-
     function loadHeader() {
         fetch('/components/header.html')
             .then(response => response.text())
@@ -38,9 +28,6 @@
                     if (menuToggle) {
                         menuToggle.addEventListener('click', window.mobileBtn);
                     }
-                    
-                    // Update mobile theme toggle text
-                    updateMobileThemeToggle();
                 }
             })
             .catch(error => {

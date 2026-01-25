@@ -16,22 +16,6 @@
 </head>
 
 <body>
-    <script>
-        // Check current theme before page loaded
-        (() => {
-            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
-            const isDark = currentTheme === 'dark';
-            const pagebody = document.getElementsByTagName('body')[0];
-            
-            if (isDark) {
-                pagebody.classList.add('dark-theme');
-            } else {
-                pagebody.classList.remove('dark-theme');
-            }
-            // Mobile theme toggle text will be updated by load-header.js after header is loaded
-        })();
-    </script>
-
     <div class="wrapper">
         <div id="header-container"></div>
 
