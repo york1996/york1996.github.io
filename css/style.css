@@ -607,16 +607,15 @@ header label {
   font-weight: normal;
 }
 .name-qr-group {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: stretch;
+  display: inline-grid;
 }
 .qrcode {
   padding: 12px 0;
 }
 .qrcode img {
-  width: 100%;
+  width: 20%;
   height: auto;
+  margin: 0 auto;
   display: block;
   border-radius: 8px;
   box-shadow: 0 0 0 0.3618em rgba(0,0,0,0.05);
