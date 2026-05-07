@@ -606,6 +606,16 @@ header label {
   font-size: 2em;
   font-weight: normal;
 }
+.qrcode {
+  padding: 12px 0;
+}
+.qrcode img {
+  width: 120px;
+  height: auto;
+  display: inline-block;
+  border-radius: 8px;
+  box-shadow: 0 0 0 0.3618em rgba(0,0,0,0.05);
+}
 .links a {
   padding: 0 5px;
 }
