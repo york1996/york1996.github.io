@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>狗狗能不能吃 · 食物安全速查</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F5F1E7;
+    --paper-soft:#EFE9DA;
+    --ink:#24261F;
+    --ink-soft:#5B5A4F;
+    --line: rgba(36,38,31,0.12);
+    --card:#FFFFFF;
+
+    --safe:#3E7A5C;
+    --safe-bg:#E7F1EB;
+    --caution:#B5791E;
+    --caution-bg:#F7EDDA;
+    --danger:#B0392C;
+    --danger-bg:#F6E4E0;
+
+    --radius: 14px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Noto Sans SC', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+
+  a{color:inherit;}
+
+  .wrap{
+    max-width:640px;
+    margin:0 auto;
+    padding-bottom:56px;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    background:var(--ink);
+    color:var(--paper);
+    padding:28px 20px 22px;
+    position:relative;
+    overflow:hidden;
+  }
+  header .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:#C9C5B3;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:10px;
+  }
+  .lights{
+    display:inline-flex;
+    gap:4px;
+  }
+  .lights span{
+    width:7px;height:7px;border-radius:50%;display:inline-block;
+  }
+  .lights .l1{background:var(--danger);}
+  .lights .l2{background:var(--caution);}
+  .lights .l3{background:var(--safe);}
+
+  header h1{
+    font-family:'Noto Serif SC', serif;
+    font-weight:900;
+    font-size:30px;
+    line-height:1.25;
+    margin:0 0 8px;
+    letter-spacing:0.01em;
+  }
+  header p{
+    margin:0;
+    font-size:13.5px;
+    color:#D8D4C4;
+    line-height:1.6;
+    max-width:46ch;
+  }
+
+  /* ---------- Sticky search / filter ---------- */
+  .controls{
+    position:sticky;
+    top:0;
+    z-index:5;
+    background:var(--paper);
+    padding:14px 20px 12px;
+    border-bottom:1px solid var(--line);
+  }
+  .search-box{
+    position:relative;
+    display:flex;
+    align-items:center;
+    background:var(--card);
+    border:1.5px solid var(--ink);
+    border-radius:12px;
+    padding:0 14px;
+  }
+  .search-box svg{ flex:0 0 auto; opacity:0.55; }
+  .search-box input{
+    flex:1;
+    border:none;
+    outline:none;
+    background:transparent;
+    font-family:'Noto Sans SC', sans-serif;
+    font-size:16px;
+    padding:12px 8px;
+    color:var(--ink);
+  }
+  .search-box input::placeholder{ color:#9C9A8C; }
+  .clear-btn{
+    display:none;
+    border:none;background:none;cursor:pointer;
+    color:var(--ink-soft);
+    font-size:18px;
+    padding:4px;
+  }
+  .clear-btn.show{ display:block; }
+
+  .chips{
+    display:flex;
+    gap:8px;
+    margin-top:10px;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .chips::-webkit-scrollbar{display:none;}
+  .chip{
+    flex:0 0 auto;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    font-weight:600;
+    padding:8px 13px;
+    border-radius:999px;
+    border:1.5px solid var(--line);
+    background:var(--card);
+    color:var(--ink-soft);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    white-space:nowrap;
+    transition:all .15s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .chip .dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
+  .chip[data-cat="all"]{}
+  .chip[data-cat="safe"]{ color:var(--safe); }
+  .chip[data-cat="caution"]{ color:var(--caution); }
+  .chip[data-cat="danger"]{ color:var(--danger); }
+  .chip.active{
+    background:var(--ink);
+    border-color:var(--ink);
+    color:var(--paper) !important;
+  }
+  .chip.active .dot{ background:var(--paper); }
+  .chip[data-cat="all"].active .dot{ display:none; }
+
+  /* ---------- Results meta ---------- */
+  .meta{
+    padding:14px 20px 4px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    letter-spacing:0.02em;
+  }
+  .meta b{ color:var(--ink); }
+
+  /* ---------- List ---------- */
+  .list{ padding:6px 16px 0; display:flex; flex-direction:column; gap:10px; }
+
+  .empty{
+    text-align:center;
+    padding:48px 20px;
+    color:var(--ink-soft);
+    font-size:14px;
+    line-height:1.8;
+  }
+  .empty .big{ font-size:34px; display:block; margin-bottom:10px; }
+
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    border:1px solid var(--line);
+    border-left:4px solid var(--line);
+    overflow:hidden;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .card[data-cat="safe"]{ border-left-color:var(--safe); }
+  .card[data-cat="caution"]{ border-left-color:var(--caution); }
+  .card[data-cat="danger"]{ border-left-color:var(--danger); }
+
+  .card-top{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:13px 14px;
+  }
+  .emoji{
+    font-size:26px;
+    width:40px; height:40px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--paper-soft);
+    border-radius:10px;
+    flex:0 0 auto;
+  }
+  .card-info{ flex:1; min-width:0; }
+  .card-name{
+    font-weight:700;
+    font-size:15.5px;
+    margin-bottom:3px;
+  }
+  .card-reason{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    line-height:1.5;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .badge{
+    flex:0 0 auto;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    font-weight:700;
+    padding:5px 9px;
+    border-radius:999px;
+  }
+  .badge[data-cat="safe"]{ background:var(--safe-bg); color:var(--safe); }
+  .badge[data-cat="caution"]{ background:var(--caution-bg); color:var(--caution); }
+  .badge[data-cat="danger"]{ background:var(--danger-bg); color:var(--danger); }
+
+  .card-detail{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .25s ease;
+  }
+  .card.open .card-detail{ max-height:220px; }
+  .card-detail-inner{
+    padding:0 14px 16px 66px;
+    font-size:13.5px;
+    line-height:1.7;
+    color:var(--ink);
+  }
+  .source-tag{
+    display:inline-block;
+    margin-top:8px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    background:var(--paper-soft);
+    padding:3px 8px;
+    border-radius:6px;
+  }
+
+  /* ---------- Footer ---------- */
+  footer{
+    margin-top:28px;
+    padding:20px 20px 8px;
+    border-top:1px solid var(--line);
+  }
+  footer h2{
+    font-family:'Noto Serif SC', serif;
+    font-size:15px;
+    margin:0 0 10px;
+  }
+  footer ul{
+    margin:0 0 16px;
+    padding-left:18px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    line-height:1.9;
+  }
+  footer .disclaimer{
+    font-size:12px;
+    color:var(--ink-soft);
+    background:var(--paper-soft);
+    border-radius:10px;
+    padding:12px 14px;
+    line-height:1.7;
+  }
+
+  @media (min-width:640px){
+    header{ padding:36px 32px 28px; border-radius:0 0 20px 20px; }
+    header h1{ font-size:34px; }
+    .controls{ padding-left:32px; padding-right:32px; }
+    .list{ padding-left:32px; padding-right:32px; }
+    .meta{ padding-left:32px; padding-right:32px; }
+    footer{ padding-left:32px; padding-right:32px; }
+    .wrap{ margin-top:14px; }
+    body{ background: var(--paper-soft); }
+    .wrap{ background:var(--paper); border-radius:20px; overflow:hidden; box-shadow:0 20px 60px rgba(36,38,31,0.12); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">
+      <span class="lights"><span class="l1"></span><span class="l2"></span><span class="l3"></span></span>
+      食物安全速查表
+    </div>
+    <h1>狗狗能不能吃这个？</h1>
+    <p>输入食物名称,一秒查到能不能吃。分类参考 ASPCA、AKC、VCA 动物医院、FDA 兽医司等权威资料整理,点击卡片可查看详细原因。</p>
+  </header>
+
+  <div class="controls">
+    <div class="search-box">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="searchInput" type="text" placeholder="搜索食物,比如“葡萄”“骨头”“南瓜”…" autocomplete="off">
+      <button class="clear-btn" id="clearBtn" aria-label="清空">✕</button>
+    </div>
+    <div class="chips" id="chips">
+      <div class="chip active" data-cat="all">全部</div>
+      <div class="chip" data-cat="safe"><span class="dot"></span>能吃</div>
+      <div class="chip" data-cat="caution"><span class="dot"></span>慎吃</div>
+      <div class="chip" data-cat="danger"><span class="dot"></span>不能吃</div>
+    </div>
+  </div>
+
+  <div class="meta" id="meta"></div>
+  <div class="list" id="list"></div>
+
+  <footer>
+    <h2>权威参考来源</h2>
+    <ul>
+      <li>ASPCA 动物毒物控制中心(APCC)— aspca.org / aspcapro.org</li>
+      <li>美国犬业俱乐部(AKC)— akc.org</li>
+      <li>VCA 动物医院(VCA Animal Hospitals)— vcahospitals.com</li>
+      <li>美国食品药品监督管理局(FDA)兽医司 — fda.gov</li>
+      <li>DoveLewis 急诊动物医院 — dovelewis.org</li>
+    </ul>
+    <div class="disclaimer">
+      本表仅供日常参考,不能替代兽医的个体化诊断建议。幼犬、老年犬、孕期/哺乳期犬及有基础疾病的狗狗需格外谨慎,如误食可疑食物请立即联系兽医。
+    </div>
+  </footer>
+</div>
+
+<script>
+const FOODS = [
+  // ---- 不能吃 danger ----
+  {name:"葡萄 / 葡萄干", alias:"putao putaogan", emoji:"🍇", cat:"danger", reason:"含酒石酸,狗无法代谢,可致急性肾衰竭,哪怕一颗也可能中毒", source:"ASPCA"},
+  {name:"巧克力", alias:"qiaokeli", emoji:"🍫", cat:"danger", reason:"含甲基黄嘌呤类化合物,会导致呕吐腹泻、心律异常、震颤、癫痫甚至死亡", source:"ASPCA / FDA"},
+  {name:"咖啡 / 含咖啡因饮品", alias:"kafei nengliangyinliao", emoji:"☕", cat:"danger", reason:"中毒机制与巧克力相同,均来自甲基黄嘌呤类化合物", source:"ASPCA"},
+  {name:"木糖醇", alias:"muxiangchun tangchunchun", emoji:"🍬", cat:"danger", reason:"会导致低血糖甚至肝损伤,常见于无糖口香糖、部分花生酱和烘焙食品", source:"ASPCA / FDA"},
+  {name:"洋葱", alias:"yangcong", emoji:"🧅", cat:"danger", reason:"含N-丙基二硫化物,破坏红细胞导致贫血,生熟粉末形态都危险", source:"ASPCA"},
+  {name:"大蒜", alias:"dasuan", emoji:"🧄", cat:"danger", reason:"与洋葱同属葱属植物,毒性机制相同,会造成红细胞损伤", source:"ASPCA"},
+  {name:"韭菜 / 香葱", alias:"jiucai xiangcong", emoji:"🌱", cat:"danger", reason:"同属葱属蔬菜,会引起胃肠刺激和溶血性贫血", source:"ASPCA"},
+  {name:"酒精 / 含酒精食品", alias:"jiujing pijiu", emoji:"🍺", cat:"danger", reason:"吸收极快,可致呕吐、共济失调、呼吸困难、昏迷甚至死亡", source:"ASPCA"},
+  {name:"生面团(未烤酵母面团)", alias:"shengmiantuan", emoji:"🫓", cat:"danger", reason:"在胃里膨胀可致胃扭转,发酵还会产生酒精引发中毒", source:"ASPCA"},
+  {name:"夏威夷果 / 澳洲坚果", alias:"xiaweiyiguo aozhoujianguo", emoji:"🌰", cat:"danger", reason:"可致虚弱、共济失调、震颤和体温升高,通常12小时内发病", source:"ASPCA"},
+  {name:"牛油果 / 鳄梨", alias:"niuyouguo eli", emoji:"🥑", cat:"danger", reason:"叶、果、籽、皮均含persin,会引起呕吐腹泻", source:"ASPCA"},
+  {name:"生肉 / 生蛋", alias:"shengrou shengdan", emoji:"🥩", cat:"danger", reason:"可能携带沙门氏菌、大肠杆菌,生蛋清还会干扰维生素吸收", source:"ASPCA"},
+
+  // ---- 慎吃 caution ----
+  {name:"骨头(生骨 / 熟骨)", alias:"gutou", emoji:"🦴", cat:"caution", reason:"容易碎裂划伤消化道甚至造成梗阻,熟骨比生骨更易碎裂", source:"VCA / ASPCA"},
+  {name:"坚果(杏仁 / 核桃 / 山核桃)", alias:"jianguo xingren hetao", emoji:"🥜", cat:"caution", reason:"油脂含量高,可能引发呕吐腹泻,甚至诱发胰腺炎", source:"ASPCA"},
+  {name:"牛奶 / 奶酪", alias:"niunai naiLao", emoji:"🧀", cat:"caution", reason:"多数狗缺乳糖酶易腹泻,小块奶酪可偶尔当零食但不宜多喂", source:"ASPCA"},
+  {name:"腌制 / 加工肉(火腿培根)", alias:"huotui peigen", emoji:"🥓", cat:"caution", reason:"盐分偏高,过量可致钠离子中毒", source:"ASPCA"},
+  {name:"柑橘类果肉", alias:"ganju chengzi", emoji:"🍊", cat:"caution", reason:"果肉少量无碍,但皮、籽、茎含刺激性精油和柠檬酸", source:"ASPCA"},
+  {name:"椰子 / 椰奶", alias:"yezi yenai", emoji:"🥥", cat:"caution", reason:"少量摄入通常无碍,过多会导致软便和腹泻", source:"ASPCA"},
+  {name:"花生酱", alias:"huashengjiang", emoji:"🫙", cat:"caution", reason:"须选无木糖醇、无盐的纯花生酱,脂肪高需控制喂食量", source:"AKC / DoveLewis"},
+  {name:"生三文鱼 / 生鱼", alias:"shengsanwenyu", emoji:"🍣", cat:"caution", reason:"未煮熟可能携带寄生虫,需彻底煮熟才安全", source:"AKC"},
+  {name:"玉米", alias:"yumi", emoji:"🌽", cat:"caution", reason:"玉米粒可以少量喂食,但玉米芯难消化易致肠道梗阻", source:"AKC"},
+  {name:"苹果籽 / 水果核", alias:"pingguozi guohe", emoji:"🍏", cat:"caution", reason:"籽含微量氰化物,果核有噎住风险,喂食前须去除", source:"Healthline / DoveLewis"},
+  {name:"罐头蔬菜(如罐头豌豆)", alias:"guantou wandou", emoji:"🥫", cat:"caution", reason:"钠含量普遍偏高,应优先选新鲜或冷冻款", source:"Healthline"},
+  {name:"西瓜", alias:"xigua", emoji:"🍉", cat:"caution", reason:"果肉本身安全,但瓜皮瓜籽有噎住和消化不良风险", source:"Healthline"},
+  {name:"红薯 / 甘薯", alias:"hongshu", emoji:"🍠", cat:"caution", reason:"适量喂食有益,但维生素A摄入过多会致骨骼问题", source:"Healthline"},
+  {name:"芒果", alias:"mangguo", emoji:"🥭", cat:"caution", reason:"适量可以,喂前需去皮去核,核有噎住风险", source:"Healthline"},
+  {name:"白面包(无调料)", alias:"baimianbao", emoji:"🥖", cat:"caution", reason:"少量不会伤身但没有营养价值,注意不能含葡萄干", source:"AKC"},
+
+  // ---- 能吃 safe ----
+  {name:"熟鸡胸肉 / 瘦牛肉猪肉", alias:"jixiongrou shourou", emoji:"🍗", cat:"safe", reason:"优质蛋白来源,喂食前需去骨去皮,不加调味料", source:"ASPCA / DoveLewis"},
+  {name:"熟鸡蛋", alias:"jidan", emoji:"🥚", cat:"safe", reason:"全熟蛋是优质蛋白来源,还有助于缓解肠胃不适", source:"AKC"},
+  {name:"熟三文鱼 / 沙丁鱼", alias:"sanwenyu shading", emoji:"🐟", cat:"safe", reason:"富含优质脂肪和蛋白质,有益关节与大脑健康", source:"AKC"},
+  {name:"胡萝卜", alias:"huluobo", emoji:"🥕", cat:"safe", reason:"低脂低卡富含维生素A,生熟皆可,还能帮助清洁牙齿", source:"ASPCA / DoveLewis"},
+  {name:"西兰花 / 花椰菜 / 四季豆", alias:"xilanhua huacaiJiaJidou", emoji:"🥦", cat:"safe", reason:"低脂高纤维,可生食(除南瓜外)或白水煮食", source:"ASPCA"},
+  {name:"南瓜泥(纯南瓜)", alias:"nangua", emoji:"🎃", cat:"safe", reason:"低脂高纤维,常被推荐用于缓解狗狗消化不良和腹泻", source:"ASPCA"},
+  {name:"苹果(去核去籽)", alias:"pingguo", emoji:"🍎", cat:"safe", reason:"富含维生素与纤维,咀嚼还能帮助清洁牙齿", source:"AKC / DoveLewis"},
+  {name:"香蕉", alias:"xiangjiao", emoji:"🍌", cat:"safe", reason:"富含纤维和多种维生素矿物质,适量当作偶尔零食", source:"AKC"},
+  {name:"蓝莓", alias:"lanmei", emoji:"🫐", cat:"safe", reason:"富含抗氧化物,热量低体积小,是健康的零食选择", source:"Healthline"},
+  {name:"草莓", alias:"caomei", emoji:"🍓", cat:"safe", reason:"洗净切小块后喂食,能提供维生素C和纤维", source:"Healthline"},
+  {name:"菠萝 / 哈密瓜 / 猕猴桃", alias:"boluo hamigua mihoutao", emoji:"🍍", cat:"safe", reason:"适量喂食可提供多种维生素,注意切小块防噎", source:"ASPCA"},
+  {name:"白米饭(煮熟无调料)", alias:"baifan", emoji:"🍚", cat:"safe", reason:"清淡易消化,常用于狗狗肠胃不适时的辅助饮食", source:"DoveLewis"},
+  {name:"藜麦", alias:"limai", emoji:"🌾", cat:"safe", reason:"营养结构优于玉米小麦大豆,部分优质狗粮已采用", source:"AKC"},
+  {name:"熟虾(去壳去头尾)", alias:"xia", emoji:"🍤", cat:"safe", reason:"富含抗氧化物、维生素B12和磷,且低脂低卡", source:"AKC"},
+  {name:"新鲜青豌豆(非罐头)", alias:"wandou", emoji:"🫛", cat:"safe", reason:"低卡高营养,是很多狗粮的常见成分,避免罐头款高盐", source:"Healthline"},
+  {name:"芹菜", alias:"qincai", emoji:"🥬", cat:"safe", reason:"低卡高纤维,适合当作健康小零食", source:"ASPCA"},
+  {name:"黄瓜", alias:"huanggua", emoji:"🥒", cat:"safe", reason:"低卡水分高,可切片当夏日清凉小零食", source:"ASPCA"},
+];
+
+const CAT_LABEL = { safe:"能吃", caution:"慎吃", danger:"不能吃" };
+
+const listEl = document.getElementById('list');
+const metaEl = document.getElementById('meta');
+const searchInput = document.getElementById('searchInput');
+const clearBtn = document.getElementById('clearBtn');
+const chips = document.querySelectorAll('.chip');
+
+let activeCat = 'all';
+let query = '';
+
+function normalize(s){ return s.toLowerCase().trim(); }
+
+function render(){
+  const q = normalize(query);
+  const filtered = FOODS.filter(f => {
+    const matchCat = activeCat === 'all' || f.cat === activeCat;
+    const hay = normalize(f.name + ' ' + (f.alias||''));
+    const matchQuery = q === '' || hay.includes(q);
+    return matchCat && matchQuery;
+  });
+
+  metaEl.innerHTML = q
+    ? `搜索 “<b>${escapeHtml(query)}</b>” 找到 <b>${filtered.length}</b> 条结果`
+    : `共收录 <b>${FOODS.length}</b> 种食物${activeCat!=='all' ? ' · 当前筛选:'+CAT_LABEL[activeCat] : ''}`;
+
+  if(filtered.length === 0){
+    listEl.innerHTML = `<div class="empty"><span class="big">🐾</span>没找到这个食物<br>没收录不代表安全,拿不准时最好先问问兽医</div>`;
+    return;
+  }
+
+  listEl.innerHTML = filtered.map((f, i) => `
+    <div class="card" data-cat="${f.cat}" data-idx="${i}">
+      <div class="card-top">
+        <div class="emoji">${f.emoji}</div>
+        <div class="card-info">
+          <div class="card-name">${escapeHtml(f.name)}</div>
+          <div class="card-reason">${escapeHtml(f.reason)}</div>
+        </div>
+        <div class="badge" data-cat="${f.cat}">${CAT_LABEL[f.cat]}</div>
+      </div>
+      <div class="card-detail">
+        <div class="card-detail-inner">
+          ${escapeHtml(f.reason)}。
+          <br><span class="source-tag">来源:${escapeHtml(f.source)}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  listEl.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => card.classList.toggle('open'));
+  });
+}
+
+function escapeHtml(str){
+  return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+searchInput.addEventListener('input', (e) => {
+  query = e.target.value;
+  clearBtn.classList.toggle('show', query.length > 0);
+  render();
+});
+
+clearBtn.addEventListener('click', () => {
+  query = '';
+  searchInput.value = '';
+  clearBtn.classList.remove('show');
+  searchInput.focus();
+  render();
+});
+
+chips.forEach(chip => {
+  chip.addEventListener('click', () => {
+    chips.forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeCat = chip.dataset.cat;
+    render();
+  });
+});
+
+render();
+</script>
+</body>
+</html>
