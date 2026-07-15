@@ -1272,6 +1272,9 @@ header label {
   .categories .categories-card .card-item .categories {
     overflow: hidden;
   }
+  .qrcode img {
+    width: 60%;
+  }
 }
 @media screen and (max-width: 1023px) {
   .navbar-mobile {
