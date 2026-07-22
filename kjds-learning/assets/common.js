@@ -29,10 +29,32 @@
           <span class="logo">跨</span>
           <span>跨境电商 · 从零到上架</span>
         </a>
-        <nav class="nav-links">${links}</nav>
+        <button class="nav-toggle" aria-label="打开导航" aria-expanded="false" aria-controls="nav-links">
+          <span class="bar"></span>
+        </button>
+        <nav id="nav-links" class="nav-links">${links}</nav>
       </div>`;
     const el = document.getElementById("site-nav");
-    if(el) el.innerHTML = html;
+    if(el){
+      el.innerHTML = html;
+      const btn = el.querySelector(".nav-toggle");
+      const linksEl = el.querySelector(".nav-links");
+      if(btn && linksEl){
+        btn.addEventListener("click", ()=>{
+          const open = linksEl.classList.toggle("open");
+          btn.setAttribute("aria-expanded", open ? "true" : "false");
+          btn.setAttribute("aria-label", open ? "关闭导航" : "打开导航");
+        });
+        // Auto-close after tapping a link (in-page anchors too)
+        linksEl.addEventListener("click", (e)=>{
+          if(e.target.tagName === "A" && linksEl.classList.contains("open")){
+            linksEl.classList.remove("open");
+            btn.setAttribute("aria-expanded", "false");
+            btn.setAttribute("aria-label", "打开导航");
+          }
+        });
+      }
+    }
   }
 
   function renderFooter(){
@@ -120,10 +142,23 @@
     });
   }
 
+  // Wrap wide <table>s in a horizontal-scrollable container so mobile
+  // doesn't force the whole page to scroll sideways.
+  function wrapTables(){
+    document.querySelectorAll(".content table, .container table").forEach(tbl=>{
+      if(tbl.parentElement && tbl.parentElement.classList.contains("table-wrap")) return;
+      const wrap = document.createElement("div");
+      wrap.className = "table-wrap";
+      tbl.parentNode.insertBefore(wrap, tbl);
+      wrap.appendChild(tbl);
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", ()=>{
     renderNav();
     renderFooter();
     setupTabs();
     setupChecklists();
+    wrapTables();
   });
 })();
