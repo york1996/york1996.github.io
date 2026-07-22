@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>交互工具 · 跨境电商学习中心</title>
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<header id="site-nav" class="nav"></header>
+
+<div class="container">
+  <div class="page-header">
+    <div class="eyebrow">07 交互工具</div>
+    <h1 class="page-title">10 个可交互学习工具</h1>
+    <p class="page-lead">看理论 → 玩工具 → 理解更快。所有工具纯本地运行（无需注册、不上传数据），进度自动保存在浏览器。</p>
+  </div>
+
+  <!-- 工具索引 -->
+  <section class="section" style="margin-top:0">
+    <div class="grid grid-4">
+      <a href="#mode" class="card" style="text-decoration:none;color:inherit"><div class="card-icon">🎯</div><h3>1. 模式适配测试</h3><p>5 道题找到最适合你的玩法</p></a>
+      <a href="#glossary" class="card" style="text-decoration:none;color:inherit"><div class="card-icon">🔍</div><h3>2. 术语查询</h3><p>45 个术语，分类 + 搜索</p></a>
+      <a href="#score" class="card" style="text-decoration:none;color:inherit"><div class="card-icon">📋</div><h3>3. 选品打分器</h3><p>12 项打分实时输出建议</p></a>
+      <a href="#profit" class="card" style="text-decoration:none;color:inherit"><div class="card-icon">💰</div><h3>4. 利润计算器</h3><p>10 个变量算清单件净利</p></a>
+      <a href="#compare" class="card" style="text-decoration:none;color:inherit"><div class="card-icon">⚖️</div><h3>5. 平台对比</h3><p>7 平台 5 维度打分</p></a>
+      <a href="#day90" class="card" style="text-decoration:none;color:inherit"><div class="card-icon">🗓️</div><h3>6. 90 天路线</h3><p>12 周任务打勾追踪</p></a>
+      <a href="#diag" class="card" style="text-decoration:none;color:inherit"><div class="card-icon">🩺</div><h3>7. Listing 诊断</h3><p>数据症状 → 动作清单</p></a>
+      <a href="#st" class="card" style="text-decoration:none;color:inherit"><div class="card-icon">🔑</div><h3>8. Search Term 生成</h3><p>自动去重 + 250 字节</p></a>
+      <a href="#bullet" class="card" style="text-decoration:none;color:inherit"><div class="card-icon">💬</div><h3>9. 五点卖点生成</h3><p>BAB 结构自动生成</p></a>
+      <a href="#prompt" class="card" style="text-decoration:none;color:inherit"><div class="card-icon">🤖</div><h3>10. AI Prompt 生成</h3><p>一键生成 Listing 提示词</p></a>
+    </div>
+  </section>
+
+  <!-- 工具 1: 模式适配 -->
+  <div class="tool" id="mode">
+    <div class="tool-label">工具 1 / 10</div>
+    <h3>🎯 模式适配测试</h3>
+    <p class="tool-desc">5 道题告诉你最适合哪种起步方式：Shopee / Temu / TikTok Shop / Amazon FBA / 独立站 DTC。</p>
+    <div class="tool-body">
+      <div id="mode-quiz"></div>
+    </div>
+  </div>
+
+  <!-- 工具 2: 术语查询 -->
+  <div class="tool" id="glossary">
+    <div class="tool-label">工具 2 / 10</div>
+    <h3>🔍 45 个必懂术语查询</h3>
+    <p class="tool-desc">按类目筛选或直接搜索。看到不懂的词随时回来查。</p>
+    <div class="tool-body">
+      <div id="glossary-panel"></div>
+    </div>
+  </div>
+
+  <!-- 工具 3: 选品打分 -->
+  <div class="tool" id="score">
+    <div class="tool-label">工具 3 / 10</div>
+    <h3>📋 选品 12 项打分卡</h3>
+    <p class="tool-desc">拖动滑块给候选品的 12 个维度打分，实时输出建议。总分 ≥ 45 才建议上架。</p>
+    <div class="tool-body">
+      <div id="score-card"></div>
+    </div>
+  </div>
+
+  <!-- 工具 4: 利润计算 -->
+  <div class="tool" id="profit">
+    <div class="tool-label">工具 4 / 10</div>
+    <h3>💰 单品利润计算器</h3>
+    <p class="tool-desc">10 个变量算清一件的真实净利。新手第一原则：<b>净利率 &lt; 10% 的品慎做</b>。</p>
+    <div class="tool-body">
+      <div id="profit-calc"></div>
+    </div>
+  </div>
+
+  <!-- 工具 5: 平台对比 -->
+  <div class="tool" id="compare">
+    <div class="tool-label">工具 5 / 10</div>
+    <h3>⚖️ 平台横向对比</h3>
+    <p class="tool-desc">7 大平台从新手友好、起量速度、利润潜力、天花板、品牌价值 5 个维度打分。</p>
+    <div class="tool-body">
+      <div id="platform-compare"></div>
+    </div>
+  </div>
+
+  <!-- 工具 6: 90 天 -->
+  <div class="tool" id="day90">
+    <div class="tool-label">工具 6 / 10</div>
+    <h3>🗓️ 90 天路线（进度自动保存）</h3>
+    <p class="tool-desc">从 Week 1 认知打底到 Week 12 季度大复盘，12 周任务清单。进度保存在你的浏览器。</p>
+    <div class="tool-body">
+      <div id="day-90"></div>
+    </div>
+  </div>
+
+  <!-- 工具 7: Listing 诊断 -->
+  <div class="tool" id="diag">
+    <div class="tool-label">工具 7 / 10</div>
+    <h3>🩺 Listing 诊断向导</h3>
+    <p class="tool-desc">告诉我你的 Listing 主要症状，返回具体优化动作清单。</p>
+    <div class="tool-body">
+      <div id="listing-diag"></div>
+    </div>
+  </div>
+
+  <!-- 工具 8: Search Term -->
+  <div class="tool" id="st">
+    <div class="tool-label">工具 8 / 10</div>
+    <h3>🔑 Amazon Search Term 生成器</h3>
+    <p class="tool-desc">填入关键词分类，自动去重、去掉标题已用词，控制在 250 字节。可直接复制到亚马逊后台。</p>
+    <div class="tool-body">
+      <div id="st-builder"></div>
+    </div>
+  </div>
+
+  <!-- 工具 9: Bullet -->
+  <div class="tool" id="bullet">
+    <div class="tool-label">工具 9 / 10</div>
+    <h3>💬 五点卖点生成器（BAB 结构）</h3>
+    <p class="tool-desc">按 5 个心理槽位 + BAB 结构填空，自动组合成 5 条卖点。示例数据可直接改成你的产品。</p>
+    <div class="tool-body">
+      <div id="bullet-builder"></div>
+    </div>
+  </div>
+
+  <!-- 工具 10: AI Prompt -->
+  <div class="tool" id="prompt">
+    <div class="tool-label">工具 10 / 10</div>
+    <h3>🤖 AI Listing Prompt 生成器</h3>
+    <p class="tool-desc">选平台 + 填产品信息，一键生成完整的 AI 提示词，复制到 ChatGPT / Claude / DeepSeek 使用。</p>
+    <div class="tool-body">
+      <div id="prompt-gen"></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <a href="listing.html" class="btn btn-outline">← 上一章：Listing 专题</a>
+    <a href="resources.html" class="btn btn-primary">下一章：资源与清单 →</a>
+  </div>
+</div>
+
+<footer id="site-footer" class="footer"></footer>
+<script src="assets/common.js"></script>
+<script src="assets/tools.js"></script>
+</body>
+</html>
