@@ -21,6 +21,16 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
+html,body{overflow-x:hidden;max-width:100vw}
+img,video{max-width:100%;height:auto}
+/* Prevent grid/flex children from forcing their intrinsic content width,
+   so their `overflow-x:auto` and our `.table-wrap` actually take effect. */
+.layout-split>*,.grid>*,.pathway>*,.tool,.tool-body,.card,.card-flat,.content,.hero-inner,.footer-inner,.footer-cols>*,.timeline-item{min-width:0}
+.content pre,.content table,.formula{max-width:100%}
+.formula{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.content pre{max-width:100%;white-space:pre;word-break:normal}
+/* Long unbreakable inline strings (URLs, English titles, long codes) should wrap on narrow screens. */
+.content code,.content li,.content p,.q-title,.tool-desc,.timeline-desc,.flow-body p{overflow-wrap:anywhere;word-break:break-word}
 body{
   font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
   background:var(--surface-2);
@@ -283,7 +293,7 @@ a:hover{text-decoration:underline}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--brand),var(--brand-2));transition:width .3s}
 
 /* ===== STAT / METRIC ===== */
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin:16px 0}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(180px,100%),1fr));gap:14px;margin:16px 0}
 .stat{background:var(--surface-3);border-radius:10px;padding:14px}
 .stat-label{font-size:12px;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
 .stat-value{font-size:24px;font-weight:800;color:var(--text);margin-top:4px}
@@ -340,8 +350,8 @@ a:hover{text-decoration:underline}
 .hide{display:none !important}
 
 /* ===== TABLE WRAP (auto-injected by common.js) ===== */
-.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:14px 0;border-radius:8px}
-.table-wrap>table{margin:0}
+.table-wrap,.table-responsive{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:14px 0;border-radius:8px;max-width:100%}
+.table-wrap>table,.table-responsive>table{margin:0}
 
 /* ===== NAV TOGGLE (mobile) ===== */
 .nav-toggle{
@@ -445,7 +455,7 @@ a:hover{text-decoration:underline}
   .footer-inner{padding:0 16px}
   .footer-cols{gap:20px;margin-bottom:20px}
 
-  .stat-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+  .stat-grid{grid-template-columns:repeat(auto-fill,minmax(min(140px,100%),1fr));gap:10px}
   .stat-value{font-size:20px}
 
   .tabs{gap:0;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none}

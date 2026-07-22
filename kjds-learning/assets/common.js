@@ -146,10 +146,15 @@
   // doesn't force the whole page to scroll sideways.
   function wrapTables(){
     document.querySelectorAll(".content table, .container table").forEach(tbl=>{
-      if(tbl.parentElement && tbl.parentElement.classList.contains("table-wrap")) return;
+      const parent = tbl.parentElement;
+      if(!parent) return;
+      // Skip if already inside a scrollable wrapper.
+      if(parent.classList.contains("table-wrap") || parent.classList.contains("table-responsive")) return;
+      const pStyle = parent.getAttribute("style") || "";
+      if(/overflow(-x)?\s*:\s*auto/i.test(pStyle)) return;
       const wrap = document.createElement("div");
       wrap.className = "table-wrap";
-      tbl.parentNode.insertBefore(wrap, tbl);
+      parent.insertBefore(wrap, tbl);
       wrap.appendChild(tbl);
     });
   }

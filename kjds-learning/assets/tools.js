@@ -175,7 +175,7 @@ window.initGlossary = function(){
       return catOk && qOk;
     });
     if(!rows.length){ list.innerHTML = `<div style="padding:24px;text-align:center;color:var(--text-3)">没找到匹配的术语</div>`; return; }
-    list.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
+    list.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));gap:12px">
       ${rows.map(t=>`
         <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
