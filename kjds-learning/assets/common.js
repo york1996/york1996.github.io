@@ -159,11 +159,76 @@
     });
   }
 
+  // Highlight the .side-toc link matching the section currently in view.
+  // On mobile (horizontal strip), also scroll the active pill into view.
+  function setupSideTocScrollSpy(){
+    const toc = document.querySelector(".side-toc");
+    if(!toc) return;
+    const links = Array.from(toc.querySelectorAll("a[href^='#']"));
+    if(!links.length) return;
+
+    const map = new Map();  // section element → link
+    links.forEach(a=>{
+      const id = decodeURIComponent(a.getAttribute("href").slice(1));
+      const sec = id && document.getElementById(id);
+      if(sec) map.set(sec, a);
+    });
+    if(!map.size) return;
+
+    let currentLink = null;
+    function setActive(link){
+      if(link === currentLink) return;
+      currentLink = link;
+      links.forEach(a=>a.classList.toggle("active", a === link));
+      // On mobile (horizontal strip), scroll the active pill into the middle.
+      if(getComputedStyle(toc).flexDirection === "row" && link){
+        const tocRect = toc.getBoundingClientRect();
+        const linkRect = link.getBoundingClientRect();
+        const target = link.offsetLeft - toc.clientWidth/2 + link.offsetWidth/2;
+        toc.scrollTo({left: Math.max(0, target), behavior: "smooth"});
+      }
+    }
+
+    // Track which sections are near the top of the viewport.
+    const visible = new Set();
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting) visible.add(e.target);
+        else visible.delete(e.target);
+      });
+      // Pick the section closest to (but not past) the trigger line.
+      const sections = Array.from(map.keys());
+      const trigger = 120;  // px from top of viewport
+      let best = null, bestTop = -Infinity;
+      sections.forEach(sec=>{
+        const top = sec.getBoundingClientRect().top;
+        if(top <= trigger && top > bestTop){ bestTop = top; best = sec; }
+      });
+      // Before any section passes the trigger, highlight the first visible one.
+      if(!best && visible.size){
+        best = sections.find(s=>visible.has(s)) || null;
+      }
+      if(best) setActive(map.get(best));
+    }, {rootMargin: "-100px 0px -60% 0px", threshold: [0, 0.25, 0.5, 1]});
+
+    map.forEach((_, sec)=>io.observe(sec));
+
+    // Also react to click so the pill highlights immediately.
+    links.forEach(a=>{
+      a.addEventListener("click", ()=>{
+        const id = decodeURIComponent(a.getAttribute("href").slice(1));
+        const sec = document.getElementById(id);
+        if(sec) setActive(a);
+      });
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", ()=>{
     renderNav();
     renderFooter();
     setupTabs();
     setupChecklists();
     wrapTables();
+    setupSideTocScrollSpy();
   });
 })();
