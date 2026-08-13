@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent 核心概念 · 交互学习</title>
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f6f5f1;
+  --ink:#1c1b19;
+  --muted:#6b675f;
+  --line:#e3e0d8;
+  --card:#fffdf8;
+  --accent:#c2410c;
+  --accent-soft:#fbe8dd;
+  --fc:#2563eb;   /* function call */
+  --mcp:#7c3aed;  /* mcp */
+  --skill:#059669;/* skill */
+  --a2a:#d97706;  /* a2a */
+  --cli:#475569;  /* cli */
+  --a2ui:#db2777; /* a2ui */
+  --shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.65;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+header.hero{
+  padding:60px 20px 40px;text-align:center;
+  background:radial-gradient(120% 140% at 50% -20%,#fff 0%,var(--bg) 60%);
+  border-bottom:1px solid var(--line);
+}
+.hero h1{font-size:clamp(26px,4vw,40px);margin:0 0 10px;letter-spacing:-.5px;font-weight:800}
+.hero .sub{color:var(--muted);max-width:640px;margin:0 auto;font-size:15px}
+.hero .chips{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chip{padding:5px 13px;border-radius:999px;font-size:13px;font-weight:600;color:#fff;cursor:pointer;border:none;transition:transform .12s,filter .12s}
+.chip:hover{transform:translateY(-1px);filter:brightness(1.05)}
+.chip[data-k=fc]{background:var(--fc)} .chip[data-k=mcp]{background:var(--mcp)}
+.chip[data-k=skill]{background:var(--skill)} .chip[data-k=a2a]{background:var(--a2a)}
+.chip[data-k=cli]{background:var(--cli)} .chip[data-k=a2ui]{background:var(--a2ui)}
+
+nav.tabs{position:sticky;top:0;z-index:20;background:rgba(246,245,241,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav.tabs .wrap{display:flex;gap:4px;overflow-x:auto;padding:8px 20px}
+nav.tabs button{white-space:nowrap;background:none;border:none;padding:9px 15px;border-radius:9px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s}
+nav.tabs button:hover{color:var(--ink);background:#ece9e1}
+nav.tabs button.on{color:var(--accent);background:var(--accent-soft)}
+
+section.panel{display:none;padding:36px 0 60px;animation:fade .35s ease}
+section.panel.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+h2.sec{font-size:22px;margin:0 0 6px;font-weight:800;letter-spacing:-.3px}
+p.lead{color:var(--muted);margin:0 0 26px;font-size:15px}
+
+/* filter bar */
+.filter{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px;align-items:center}
+.filter .f{padding:6px 13px;border-radius:999px;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
+.filter .f:hover{border-color:var(--accent)}
+.filter .f.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;transition:transform .18s,box-shadow .18s}
+.card:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(0,0,0,.05),0 16px 40px rgba(0,0,0,.09)}
+.card .top{padding:18px 20px;cursor:pointer;position:relative}
+.card .badge{display:inline-block;font-size:11px;font-weight:700;color:#fff;padding:3px 9px;border-radius:6px;letter-spacing:.3px}
+.card h3{margin:12px 0 4px;font-size:18px;font-weight:800}
+.card .en{color:var(--muted);font-size:12.5px;font-weight:500}
+.card .one{margin:10px 0 0;font-size:13.5px;color:#3d3a34}
+.card .toggle{position:absolute;top:18px;right:18px;font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:7px;padding:3px 8px;background:#fff}
+.card .detail{max-height:0;overflow:hidden;transition:max-height .35s ease;border-top:0 solid var(--line)}
+.card.open .detail{max-height:1400px;border-top:1px solid var(--line)}
+.detail .body{padding:16px 20px 20px}
+.detail h4{margin:14px 0 5px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--accent)}
+.detail h4:first-child{margin-top:0}
+.detail p{margin:0;font-size:13.5px;color:#33302b}
+.detail ul{margin:5px 0 0;padding-left:18px;font-size:13.5px;color:#33302b}
+.detail li{margin:3px 0}
+.detail .po{color:#047857}.detail .co{color:#b91c1c}
+.detail code{background:#f0ede4;padding:1px 5px;border-radius:4px;font-size:12px}
+
+/* accent left border by key */
+.k-fc{border-left:4px solid var(--fc)} .k-mcp{border-left:4px solid var(--mcp)}
+.k-skill{border-left:4px solid var(--skill)} .k-a2a{border-left:4px solid var(--a2a)}
+.k-cli{border-left:4px solid var(--cli)} .k-a2ui{border-left:4px solid var(--a2ui)}
+.b-fc{background:var(--fc)} .b-mcp{background:var(--mcp)} .b-skill{background:var(--skill)}
+.b-a2a{background:var(--a2a)} .b-cli{background:var(--cli)} .b-a2ui{background:var(--a2ui)}
+
+/* compare */
+.cmp-pick{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:24px}
+.cmp-pick .col{flex:1;min-width:240px}
+.cmp-pick label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.cmp-pick select{width:100%;padding:11px 12px;border-radius:11px;border:1px solid var(--line);background:var(--card);font-size:15px;font-weight:600;color:var(--ink);cursor:pointer}
+.cmp-out{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cmp-out .cc{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:20px}
+.cmp-out .cc h3{margin:8px 0 2px;font-size:18px}
+.cmp-out .cc .en{color:var(--muted);font-size:12px}
+.cmp-row{margin-top:14px}
+.cmp-row .lbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--accent);margin-bottom:2px}
+.cmp-row .val{font-size:13.5px;color:#33302b}
+.cmp-vs{text-align:center;margin:20px 0 6px;font-size:13px;color:var(--muted)}
+.rel-note{margin-top:18px;background:var(--accent-soft);border-radius:14px;padding:14px 18px;font-size:13.5px;color:#7c2d12}
+.rel-note b{color:#7c2d12}
+
+/* diagram */
+.diagram{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:26px;overflow-x:auto}
+.layer{border:1.5px dashed var(--line);border-radius:14px;padding:16px 18px;margin:0 0 8px;position:relative;background:#fffefb}
+.layer .tag{position:absolute;top:-10px;left:16px;background:var(--card);padding:0 8px;font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.5px}
+.layer p{margin:2px 0;font-size:13.5px}
+.arrow{text-align:center;color:var(--muted);font-size:18px;margin:2px 0}
+.nodes{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:6px}
+.node{border-radius:12px;padding:12px;color:#fff;font-size:13px;text-align:center;font-weight:600;line-height:1.4}
+.node small{display:block;font-weight:400;opacity:.9;font-size:11.5px;margin-top:3px}
+@media(max-width:640px){.nodes{grid-template-columns:repeat(2,1fr)}.cmp-out{grid-template-columns:1fr}}
+
+/* eco */
+.eco{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px}
+.eco .box{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--card)}
+.eco .box h5{margin:0 0 8px;font-size:13px;font-weight:800}
+.eco .box .t{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+.eco .box p{margin:3px 0;font-size:12.5px;color:#33302b}
+@media(max-width:700px){.eco{grid-template-columns:1fr}}
+
+/* table */
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%;min-width:760px;background:var(--card);font-size:13px}
+th,td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{position:sticky;top:0;background:#f4f1e9;font-weight:800;font-size:12.5px}
+tbody th{font-weight:700;color:var(--muted);white-space:nowrap;background:#faf8f2}
+td.hl,th.hl{background:var(--accent-soft)!important}
+.dimhint{font-size:12.5px;color:var(--muted);margin:10px 0 0}
+
+/* quiz */
+.quiz{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:24px}
+.q{margin-bottom:8px}
+.q .qt{font-weight:700;font-size:15px;margin-bottom:12px}
+.q .opts{display:grid;gap:8px}
+.q .opt{padding:11px 14px;border:1px solid var(--line);border-radius:11px;background:#fffefb;cursor:pointer;font-size:14px;transition:all .15s}
+.q .opt:hover{border-color:var(--accent)}
+.q .opt.correct{background:#dcfce7;border-color:#16a34a;color:#14532d}
+.q .opt.wrong{background:#fee2e2;border-color:#dc2626;color:#7f1d1d}
+.q .exp{margin-top:12px;font-size:13px;color:#33302b;background:#f4f1e9;border-radius:10px;padding:12px 14px;display:none}
+.q .exp.show{display:block}
+.quiz .nav{display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.quiz .nav button{background:var(--ink);color:#fff;border:none;padding:9px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer}
+.quiz .nav button:disabled{opacity:.4;cursor:default}
+.quiz .prog{font-size:13px;color:var(--muted)}
+.score{text-align:center;padding:20px}
+.score .big{font-size:44px;font-weight:800;color:var(--accent)}
+
+footer{border-top:1px solid var(--line);padding:26px 20px;text-align:center;color:var(--muted);font-size:12.5px}
+footer a{color:var(--accent)}
+.hint{font-size:12px;color:var(--muted);margin-top:4px}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>AI Agent 核心概念 · 交互学习</h1>
+    <p class="sub">把 Function Call、MCP、Skill、A2A、CLI、A2UI 六个高频又易混的概念讲清楚，理清它们的层级与关系。点击下方标签直达对应概念。</p>
+    <div class="chips">
+      <button class="chip" data-k="fc" data-go="fc">Function Call</button>
+      <button class="chip" data-k="mcp" data-go="mcp">MCP</button>
+      <button class="chip" data-k="skill" data-go="skill">Skill</button>
+      <button class="chip" data-k="a2a" data-go="a2a">A2A</button>
+      <button class="chip" data-k="cli" data-go="cli">CLI</button>
+      <button class="chip" data-k="a2ui" data-go="a2ui">A2UI</button>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="wrap">
+    <button data-tab="cards" class="on">概念卡片</button>
+    <button data-tab="compare">两两对比</button>
+    <button data-tab="map">关系图谱</button>
+    <button data-tab="table">对比总表</button>
+    <button data-tab="quiz">自测 6 题</button>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- CARDS -->
+<section class="panel on" id="cards">
+  <h2 class="sec">概念卡片</h2>
+  <p class="lead">按“层级”筛选，或点任意卡片展开：是什么 / 怎么用 / 关系定位 / 优缺点。</p>
+  <div class="filter" id="filter">
+    <span class="f on" data-cat="all">全部</span>
+    <span class="f" data-cat="机制">底层机制</span>
+    <span class="f" data-cat="能力供给">能力供给</span>
+    <span class="f" data-cat="协作/输出">协作 / 输出</span>
+  </div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<!-- COMPARE -->
+<section class="panel" id="compare">
+  <h2 class="sec">任选两个概念对比</h2>
+  <p class="lead">选中两个概念，并排看关键维度，底部给出它们之间的真实关系。</p>
+  <div class="cmp-pick">
+    <div class="col"><label>概念 A</label><select id="selA"></select></div>
+    <div class="col"><label>概念 B</label><select id="selB"></select></div>
+  </div>
+  <div class="cmp-out" id="cmpOut"></div>
+  <div class="rel-note" id="relNote"></div>
+</section>
+
+<!-- MAP -->
+<section class="panel" id="map">
+  <h2 class="sec">关系图谱</h2>
+  <p class="lead">从“人”到“系统能力”自上而下分层，看清每个概念所处位置。</p>
+  <div class="diagram">
+    <div class="layer">
+      <span class="tag">用户 / 界面层</span>
+      <p><b style="color:var(--a2ui)">A2UI</b> — Agent 生成 UI 描述(JSON)，界面用原生组件响应式呈现 &amp; 收集用户交互</p>
+    </div>
+    <div class="arrow">▲ 用户交互事件 ／ ▼ UI 描述</div>
+    <div class="layer">
+      <span class="tag">Agent 决策层</span>
+      <p>· 加载 <b style="color:var(--skill)">Skill</b>（做某类任务的最佳实践 / 知识 / 脚本）</p>
+      <p>· 用 <b style="color:var(--fc)">Function Call</b> 表达“要调用哪个工具”</p>
+    </div>
+    <div class="arrow">▼ Function Call（统一的“调用表达”机制）</div>
+    <div class="nodes">
+      <div class="node b-mcp">MCP Server<small>结构化工具/数据 · 可发现可鉴权</small></div>
+      <div class="node b-cli">bash → CLI<small>git / curl / ffmpeg · 非结构化灵活</small></div>
+      <div class="node" style="background:#0891b2">本地函数<small>宿主自定义</small></div>
+      <div class="node b-a2a">其他 Agent<small>经 A2A 横向协作</small></div>
+    </div>
+    <p class="dimhint">左三者是“工具 / 能力供给”，最右是“横向委托给别的 Agent”。</p>
+  </div>
+
+  <h2 class="sec" style="margin-top:34px">A2UI 在 Agent-UI 生态中的位置</h2>
+  <p class="lead">据 <a href="https://a2ui.org" target="_blank" rel="noopener">a2ui.org</a>：A2UI 是“内容 / 格式”，与“传输管道”和“服务端拥有 UI”区分开。</p>
+  <div class="eco">
+    <div class="box">
+      <div class="t">传输（管道）</div>
+      <h5>A2A · AG-UI · SSE / WebSocket</h5>
+      <p>负责把消息送达</p>
+      <p>AG-UI 已 day-zero 兼容 A2UI</p>
+    </div>
+    <div class="box" style="border-color:var(--a2ui)">
+      <div class="t" style="color:var(--a2ui)">UI 内容（载荷）</div>
+      <h5>A2UI</h5>
+      <p>声明式组件蓝图(JSON)</p>
+      <p>客户端用原生组件渲染</p>
+    </div>
+    <div class="box">
+      <div class="t">服务端拥有 UI</div>
+      <h5>MCP Apps</h5>
+      <p>ui:// 预制 HTML</p>
+      <p>沙箱 iframe 渲染</p>
+    </div>
+  </div>
+  <div class="rel-note" style="margin-top:18px">
+    <b>搭配口径：</b>A2UI + AG-UI（管道+内容）；A2UI + A2A（多 Agent 间传输）；A2UI + MCP（官方称即将有桥接）。想让服务端拥有完整 UI 体验用 <b>MCP Apps</b>，想要贴合自家 App、跨平台的动态 UI 用 <b>A2UI</b>。
+  </div>
+</section>
+
+<!-- TABLE -->
+<section class="panel" id="table">
+  <h2 class="sec">六概念对比总表</h2>
+  <p class="lead">点表头某一列可高亮该概念；点左侧维度行可高亮该维度，便于横向扫读。</p>
+  <div class="tblwrap">
+    <table id="cmpTable"></table>
+  </div>
+  <p class="dimhint">成熟度与风险为综合判断；A2UI 依据官方 v0.9 现状。</p>
+</section>
+
+<!-- QUIZ -->
+<section class="panel" id="quiz">
+  <h2 class="sec">自测 6 题</h2>
+  <p class="lead">检验一下你是否真的分清了它们。选完立即看解析。</p>
+  <div class="quiz" id="quizBox"></div>
+</section>
+
+</div>
+
+<footer>
+  概念整理供技术团队通识使用 · A2UI 内容依据官方站点 <a href="https://a2ui.org" target="_blank" rel="noopener">a2ui.org</a>（Google, Apache 2.0）· 其余为业界通用定义，细节以各自最新规范为准。
+</footer>
+
+<script>
+const DATA = {
+  fc:{key:'fc',name:'Function Call',en:'函数调用',cat:'机制',catLabel:'底层机制',
+    one:'模型输出结构化 JSON，请求宿主调用某个预定义函数。',
+    what:'大模型本身只会生成文本。Function Call 是一种约定：告诉模型有哪些函数可用（名字、参数、类型），模型在需要时不直接回答，而是输出一段结构化 JSON 表示“请调用 getWeather(city=北京)”。宿主解析、执行、把结果喂回模型，模型据此继续。',
+    how:['定义函数 schema（名称、描述、参数的 JSON Schema）','随对话把 schema 传给模型','模型返回 tool_call，宿主执行并回填结果','循环直到模型给出最终自然语言答复'],
+    rel:'一切工具调用的地基。MCP 暴露的工具、Skill 里调的能力、bash 调的 CLI，最终在模型侧都以 Function Call 的形态被“决定要不要调用”。MCP 解决“工具从哪来”，Function Call 解决“模型怎么表达要调它”。',
+    pro:['机制简单通用','几乎所有主流模型原生支持','延迟低'],
+    con:['函数定义与宿主强耦合，跨应用无法复用','工具一多 schema 塞满上下文、选错概率上升','没有统一的发现/鉴权/传输标准'],
+    maturity:'高', target:'预定义函数', produce:'宿主定义函数', risk:'耦合、选错工具'},
+  mcp:{key:'mcp',name:'MCP',en:'Model Context Protocol',cat:'能力供给',catLabel:'工具接入协议',
+    one:'一套标准协议，让模型/客户端以统一方式接入外部工具、数据、资源。',
+    what:'Anthropic 提出的开放协议，标准化“模型/AI 应用如何连接外部工具、数据源和资源”。常被比喻为 AI 领域的 USB-C：工具方只需实现一次 MCP Server，任何支持 MCP 的客户端都能接入，不用再写私有胶水代码。',
+    how:['把能力实现成 MCP Server（暴露 Tools / Resources / Prompts）','在支持 MCP 的宿主里配置该 Server','模型经标准接口发现并（通过 Function Call 机制）调用其中的 Tools'],
+    rel:'Function Call 的“标准化供给侧”。Function Call 是模型侧表达“要调工具”的动作，MCP 规定工具怎么被描述、发现、鉴权和传输，从而让工具跨应用复用。与 A2A 互补：MCP 连“工具”，A2A 连“另一个 Agent”。',
+    pro:['一次实现处处可用、生态解耦','支持本地(stdio)与远程(HTTP/SSE)','有 Resources/Prompts 等超出单纯函数的语义'],
+    con:['需额外运行 Server 进程，有部署与鉴权复杂度','协议较新、生态与安全实践仍在演进','简单单机场景可能“杀鸡用牛刀”'],
+    maturity:'中（快速演进）', target:'外部工具/数据', produce:'工具方实现 Server', risk:'部署/鉴权复杂'},
+  skill:{key:'skill',name:'Skill',en:'技能',cat:'能力供给',catLabel:'能力/知识封装',
+    one:'打包好的一套“做某类任务的最佳实践+资源”，按需加载进上下文。',
+    what:'把“完成某一类任务的最佳实践、指令、脚本和资源”打包成一个模块（通常是含 SKILL.md 的文件夹）。任务匹配时，模型按需把这套说明加载进上下文，从而在该任务上更专业、更一致。例如“生成规范 Word 文档”“填写 PDF 表单”各是一个 Skill。',
+    how:['每个 Skill 有触发描述（什么时候该用）','模型判断相关时读取其 SKILL.md，遵循其中流程与约束','Skill 可附带脚本、模板、参考文档，执行时调用'],
+    rel:'与 MCP 的区别：MCP 给“能调用的工具/数据”（能力接口），Skill 给“怎么把事做好的知识与流程”（专家经验）。一个 Skill 内部可能调用 MCP 工具、触发 Function Call、或 shell out 调 CLI。',
+    pro:['把领域最佳实践沉淀为可复用资产','按需加载省上下文','降低重复的提示词工程、输出质量更稳定'],
+    con:['需要人工沉淀与维护','质量取决于编写者','触发判断可能失误（该用没用/不该用却用）'],
+    maturity:'中', target:'任务最佳实践', produce:'人工沉淀经验', risk:'维护成本、误触发'},
+  a2a:{key:'a2a',name:'A2A',en:'Agent-to-Agent',cat:'协作/输出',catLabel:'Agent 协作协议',
+    one:'智能体之间互相发现、委托、协作的通信协议。',
+    what:'让多个独立 Agent 之间互相发现、通信、委托任务并协作的协议/模式（Google 主导的 A2A 是代表）。每个 Agent 对外发布一张“能力名片”(Agent Card)，说明它能做什么、如何调用，其他 Agent 据此把子任务委托给它。',
+    how:['Agent 发布自身能力描述（Agent Card / 服务端点）','编排方或主 Agent 发现合适 Agent，按协议发送任务、接收结果（支持长任务、流式、状态更新）','典型：一个协调 Agent 把任务拆给多个专业 Agent'],
+    rel:'横向（Agent 之间）的协作；MCP 更偏纵向（Agent 接入工具/数据）。二者互补：一个 Agent 通过 MCP 用工具，通过 A2A 把搞不定的部分交给别的 Agent。A2UI 消息也可经 A2A 通道在多 Agent 间传输。',
+    pro:['支持复杂任务分工','专业 Agent 可独立演进与复用','天然分布式'],
+    con:['编排复杂度高、调试困难','多跳通信带来延迟与失败传播','鉴权与信任边界难处理、标准仍早期'],
+    maturity:'早期', target:'其他 Agent', produce:'各 Agent 发布能力', risk:'编排复杂、延迟'},
+  cli:{key:'cli',name:'CLI',en:'Command-Line Interface',cat:'能力供给',catLabel:'非结构化工具供给',
+    one:'Agent 经 bash 工具调用系统里现成命令行程序的通用能力面。',
+    what:'在 Agent 语境里，CLI 是 Agent 可调用的一种极其通用的能力面：Agent 通过一个 bash/shell 工具去调用系统里现成的命令行程序——git、ffmpeg、curl 等。这个 bash 工具本身就是一次 Function Call；Skill 打包的脚本内部往往也在 shell out 调各种 CLI。一个 bash 工具几乎等于把系统上所有命令行程序一次性变成可用能力。',
+    how:['给 Agent 提供一个 bash 工具，模型自行拼出命令（如 git log --oneline -20）','宿主执行、把 stdout/stderr 回填给模型','Skill 脚本内部同样以此把一串命令行操作封装成可复用步骤'],
+    rel:'一种非结构化的工具供给方式，与 MCP 形成鲜明对比：MCP 是结构化、带 schema、可发现、可鉴权；bash 调 CLI 是非结构化、靠模型自己拼命令、极灵活但更危险。能标准化/需鉴权的走 MCP，长尾/临时/一次性的走 bash+CLI。它由 Function Call 机制触发。',
+    pro:['覆盖面极广（系统里所有命令行程序即刻可用）','零额外封装成本、灵活','贴近开发者既有工作流'],
+    con:['安全风险高（拼出的命令可能破坏系统，需沙箱与白名单）','输出非结构化需模型二次解析','命令可能拼错、跨平台差异大、缺乏统一发现与鉴权'],
+    maturity:'高', target:'系统命令行程序', produce:'系统现成命令', risk:'命令执行安全风险高'},
+  a2ui:{key:'a2ui',name:'A2UI',en:'Agent-to-UI',cat:'协作/输出',catLabel:'界面输出协议',
+    one:'声明式 UI 协议，Agent 生成 JSON 描述、客户端用原生组件渲染。',
+    what:'A2UI（Agent to UI）是面向“智能体驱动界面”的声明式 UI 协议，由 Google 提出（开放协议，Apache 2.0）。让 AI Agent 生成丰富、可交互的界面，并在 Web/移动/桌面上以原生组件渲染，且不需要执行任意代码。解决纯文本交互效率低的痛点，思路是传输一份“像数据一样安全、像代码一样有表达力”的 UI 描述。',
+    how:['Agent 以结构化输出方式生成一批 JSON 消息描述 UI（扁平组件列表+ID 引用，便于流式生成与纠错）','消息可走任意传输通道（A2A、AG-UI、SSE、WebSocket）','客户端从自己受信任的组件目录(Catalog)取组件渲染，安全与样式由客户端掌控','核心概念：Surface(画布) / Component(组件) / Data Model(状态) / Catalog(目录) / Message(消息)'],
+    rel:'是“UI 的内容/格式”，不是传输也不是框架。与 A2A / AG-UI 互补（它们是管道，A2UI 是内容）；与 MCP Apps 区分（MCP Apps 服务端拥有 UI、iframe 渲染，A2UI 由宿主掌控样式、原生渲染）。',
+    pro:['安全：声明式数据而非代码，只从受信任目录取组件，无代码执行风险','原生体验：不用 iframe，客户端用自己 UI 框架渲染，继承样式/无障碍/性能','可移植：一份 JSON 可在 Web/移动/桌面渲染'],
+    con:['样式能力有限（服务端侧样式支持有限，主要靠客户端）','协议较新、仍在演进（v0.8→v0.9 有破坏性变化）','需客户端预先实现组件目录与渲染层'],
+    maturity:'早期（v0.9）', target:'前端 UI（原生组件）', produce:'Agent 生成 JSON', risk:'协议演进、样式受限'}
+};
+const ORDER=['fc','mcp','skill','a2a','cli','a2ui'];
+
+// ---------- CARDS ----------
+const grid=document.getElementById('grid');
+function renderCards(){
+  grid.innerHTML='';
+  ORDER.forEach(k=>{
+    const d=DATA[k];
+    const el=document.createElement('div');
+    el.className='card k-'+k; el.dataset.cat=d.cat; el.dataset.key=k;
+    el.innerHTML=`
+      <div class="top">
+        <span class="toggle">展开 ▾</span>
+        <span class="badge b-${k}">${d.catLabel}</span>
+        <h3>${d.name}</h3>
+        <div class="en">${d.en}</div>
+        <p class="one">${d.one}</p>
+      </div>
+      <div class="detail"><div class="body">
+        <h4>是什么</h4><p>${d.what}</p>
+        <h4>怎么用</h4><ul>${d.how.map(x=>`<li>${x}</li>`).join('')}</ul>
+        <h4>关系定位</h4><p>${d.rel}</p>
+        <h4>优点</h4><ul class="po">${d.pro.map(x=>`<li>${x}</li>`).join('')}</ul>
+        <h4>缺点</h4><ul class="co">${d.con.map(x=>`<li>${x}</li>`).join('')}</ul>
+      </div></div>`;
+    el.querySelector('.top').addEventListener('click',()=>{
+      el.classList.toggle('open');
+      el.querySelector('.toggle').textContent=el.classList.contains('open')?'收起 ▴':'展开 ▾';
+    });
+    grid.appendChild(el);
+  });
+}
+renderCards();
+
+document.getElementById('filter').addEventListener('click',e=>{
+  const f=e.target.closest('.f'); if(!f)return;
+  document.querySelectorAll('#filter .f').forEach(x=>x.classList.remove('on'));
+  f.classList.add('on');
+  const cat=f.dataset.cat;
+  document.querySelectorAll('#grid .card').forEach(c=>{
+    c.style.display=(cat==='all'||c.dataset.cat===cat)?'':'none';
+  });
+});
+
+// ---------- TABS ----------
+document.querySelectorAll('nav.tabs button').forEach(b=>{
+  b.addEventListener('click',()=>switchTab(b.dataset.tab));
+});
+function switchTab(id){
+  document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('on',x.dataset.tab===id));
+  document.querySelectorAll('section.panel').forEach(p=>p.classList.toggle('on',p.id===id));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+// hero chips -> open card
+document.querySelectorAll('.chip').forEach(c=>{
+  c.addEventListener('click',()=>{
+    switchTab('cards');
+    document.querySelectorAll('#filter .f').forEach(x=>x.classList.remove('on'));
+    document.querySelector('#filter .f[data-cat=all]').classList.add('on');
+    document.querySelectorAll('#grid .card').forEach(x=>x.style.display='');
+    const card=document.querySelector('#grid .card[data-key='+c.dataset.go+']');
+    if(card){card.classList.add('open');card.querySelector('.toggle').textContent='收起 ▴';
+      setTimeout(()=>card.scrollIntoView({behavior:'smooth',block:'center'}),120);}
+  });
+});
+
+// ---------- COMPARE ----------
+const REL={
+  'fc|mcp':'MCP 是 Function Call 的“标准化供给侧”。FC 是模型表达“要调用”的动作，MCP 规定工具怎么被描述、发现、鉴权，让工具跨应用复用。',
+  'fc|skill':'FC 是执行动作的机制，Skill 是指导“如何组织这些动作”的知识。Skill 内部常触发一次或多次 Function Call。',
+  'fc|a2a':'FC 面向“调工具”，A2A 面向“调另一个 Agent”。一个 Agent 用 FC 调工具，用 A2A 委托别的 Agent。',
+  'fc|cli':'调用 CLI 的那个 bash 工具，本身就是通过 Function Call 机制触发的。CLI 是 FC 落地的一种非结构化目标。',
+  'fc|a2ui':'FC 让 Agent 先调工具拿数据，A2UI 再决定把结果以什么界面呈现。一个偏“做事”，一个偏“呈现”。',
+  'mcp|skill':'MCP 给“能调用什么”（工具接口），Skill 给“怎么把事做好”（专家经验）。互补，Skill 内部可调 MCP 工具。',
+  'mcp|a2a':'经典对照：MCP 连“工具”（纵向接入），A2A 连“另一个 Agent”（横向协作）。二者互补。',
+  'mcp|cli':'同为工具供给，但风格相反：MCP 结构化、可发现、可鉴权；bash 调 CLI 非结构化、靠模型拼命令、灵活但更危险。能标准化的走 MCP，长尾/临时的走 CLI。',
+  'mcp|a2ui':'官方称即将有桥接，让 MCP 服务端在提供 HTML 资源之外也能提供 A2UI 蓝图。注意区分 A2UI 与 MCP Apps（后者服务端拥有 UI、iframe 渲染）。',
+  'skill|a2a':'Skill 是单个 Agent 内“怎么做好某类任务”的知识；A2A 是把任务拆给多个 Agent。层级不同，可叠加使用。',
+  'skill|cli':'Skill 打包的脚本内部往往就是在 shell out 调 CLI，把一串命令行操作封装成一个可复用步骤。',
+  'skill|a2ui':'Skill 指导 Agent 把事做好，A2UI 负责把做出来的结果动态呈现给用户。分处“执行知识”与“界面输出”。',
+  'a2a|cli':'A2A 是 Agent 间的横向协作协议；CLI 是单个 Agent 调系统命令的能力。前者“交给谁做”，后者“用什么做”。',
+  'a2a|a2ui':'互补：A2A 是“管道”（可在多 Agent 间传消息），A2UI 是“内容”（UI 描述）。A2UI 消息可经 A2A 传输。',
+  'cli|a2ui':'一个是 Agent 向系统调命令（输入侧能力），一个是 Agent 向界面输出 UI（呈现侧协议），几乎不直接相关。'
+};
+function relOf(a,b){return REL[a+'|'+b]||REL[b+'|'+a]||'这两个概念处于不同层级，通常可叠加使用而非替代关系。';}
+const selA=document.getElementById('selA'),selB=document.getElementById('selB');
+ORDER.forEach(k=>{
+  selA.add(new Option(DATA[k].name,k));
+  selB.add(new Option(DATA[k].name,k));
+});
+selA.value='mcp'; selB.value='cli';
+function cmpCard(k){const d=DATA[k];return `
+  <div class="cc k-${k}">
+    <span class="badge b-${k}">${d.catLabel}</span>
+    <h3>${d.name}</h3><div class="en">${d.en}</div>
+    <div class="cmp-row"><div class="lbl">一句话</div><div class="val">${d.one}</div></div>
+    <div class="cmp-row"><div class="lbl">解决什么</div><div class="val">${d.what.slice(0,80)}…</div></div>
+    <div class="cmp-row"><div class="lbl">对接对象</div><div class="val">${d.target}</div></div>
+    <div class="cmp-row"><div class="lbl">成熟度</div><div class="val">${d.maturity}</div></div>
+    <div class="cmp-row"><div class="lbl">主要优点</div><div class="val">${d.pro[0]}</div></div>
+    <div class="cmp-row"><div class="lbl">主要风险</div><div class="val">${d.risk}</div></div>
+  </div>`;}
+function renderCompare(){
+  const a=selA.value,b=selB.value;
+  document.getElementById('cmpOut').innerHTML=cmpCard(a)+cmpCard(b);
+  document.getElementById('relNote').innerHTML= a===b?
+    '<b>选择两个不同的概念以查看它们的关系。</b>':
+    '<b>关系：</b>'+relOf(a,b);
+}
+selA.addEventListener('change',renderCompare);
+selB.addEventListener('change',renderCompare);
+renderCompare();
+
+// ---------- TABLE ----------
+const DIMS=[
+  ['层级','catLabel'],['解决的核心问题','one'],['对接对象','target'],
+  ['谁来生产','produce'],['成熟度','maturity'],['主要风险','risk']
+];
+function renderTable(){
+  const t=document.getElementById('cmpTable');
+  let head='<thead><tr><th>维度</th>'+ORDER.map(k=>`<th data-col="${k}" style="cursor:pointer">${DATA[k].name}</th>`).join('')+'</tr></thead>';
+  let body='<tbody>';
+  DIMS.forEach(([label,field],i)=>{
+    body+=`<tr data-row="${i}"><th style="cursor:pointer">${label}</th>`+
+      ORDER.map(k=>`<td data-col="${k}">${DATA[k][field]}</td>`).join('')+'</tr>';
+  });
+  body+='</tbody>';
+  t.innerHTML=head+body;
+  t.querySelectorAll('th[data-col]').forEach(th=>{
+    th.addEventListener('click',()=>{
+      const col=th.dataset.col, was=th.classList.contains('hl');
+      t.querySelectorAll('.hl').forEach(x=>x.classList.remove('hl'));
+      if(!was) t.querySelectorAll('[data-col="'+col+'"]').forEach(x=>x.classList.add('hl'));
+    });
+  });
+  t.querySelectorAll('tbody tr').forEach(tr=>{
+    tr.querySelector('th').addEventListener('click',()=>{
+      const was=tr.classList.contains('rowhl');
+      t.querySelectorAll('tbody tr').forEach(x=>{x.classList.remove('rowhl');x.querySelectorAll('td,th').forEach(c=>c.classList.remove('hl'));});
+      if(!was){tr.classList.add('rowhl');tr.querySelectorAll('td,th').forEach(c=>c.classList.add('hl'));}
+    });
+  });
+}
+renderTable();
+
+// ---------- QUIZ ----------
+const QUIZ=[
+  {q:'模型侧“表达要调用某个工具”的最底层机制是？',opts:['MCP','Function Call','A2A','Skill'],ans:1,
+   exp:'Function Call 是一切工具调用的地基。MCP 暴露的工具、Skill 调的能力、bash 调的 CLI，最终在模型侧都以 Function Call 的形态被决定是否调用。'},
+  {q:'下列哪项最准确描述 MCP 与 bash 调 CLI 的关系？',opts:['两者是同一种东西','MCP 结构化可鉴权，CLI 非结构化更灵活但更危险，二者互补','CLI 会取代 MCP','MCP 只能在浏览器里用'],ans:1,
+   exp:'同为工具供给但风格相反：能标准化、需鉴权的走 MCP；长尾、临时、一次性的走 bash+CLI。'},
+  {q:'“把某类任务的最佳实践、脚本和资源打包、按需加载进上下文”指的是？',opts:['A2UI','A2A','Skill','MCP'],ans:2,
+   exp:'Skill 给的是“怎么把事做好”的知识与流程；MCP 给的是“能调用什么”的工具接口，二者互补。'},
+  {q:'按 a2ui.org 官方口径，A2UI 与 AG-UI 的关系是？',opts:['A2UI 是管道，AG-UI 是内容','二者竞争、互相替代','AG-UI 是传输管道，A2UI 是要渲染的内容，互补','A2UI 只能配 AG-UI 使用'],ans:2,
+   exp:'官方明确：AG-UI 当“管道”，A2UI 当“内容”，且 AG-UI 已 day-zero 兼容 A2UI。A2UI 也能经 A2A、SSE、WebSocket 传输。'},
+  {q:'A2UI 相比“iframe 传 HTML”的核心安全优势在于？',opts:['传输更快','声明式数据而非代码，只从受信任组件目录渲染，无代码执行风险','用了更强的加密','完全不需要客户端'],ans:1,
+   exp:'A2UI 传的是描述 UI 的声明式 JSON，客户端用自己受信任目录里的原生组件渲染，因此没有执行任意远端代码的风险。'},
+  {q:'一个 Agent 把“它搞不定的子任务交给另一个专业 Agent”，用的是？',opts:['Function Call','A2A','CLI','Skill'],ans:1,
+   exp:'A2A 是 Agent 间横向协作协议（发布 Agent Card、委托任务）；MCP/CLI 是接入工具的纵向能力。'}
+];
+let qi=0, answered=Array(QUIZ.length).fill(-1), score=0;
+const box=document.getElementById('quizBox');
+function renderQuiz(){
+  if(qi>=QUIZ.length){renderScore();return;}
+  const item=QUIZ[qi];
+  box.innerHTML=`
+    <div class="q">
+      <div class="qt">${qi+1}. ${item.q}</div>
+      <div class="opts">${item.opts.map((o,i)=>`<div class="opt" data-i="${i}">${o}</div>`).join('')}</div>
+      <div class="exp" id="exp">${item.exp}</div>
+    </div>
+    <div class="nav">
+      <span class="prog">第 ${qi+1} / ${QUIZ.length} 题 · 已答对 ${score}</span>
+      <button id="next" disabled>${qi===QUIZ.length-1?'看结果':'下一题 →'}</button>
+    </div>`;
+  const opts=box.querySelectorAll('.opt');
+  opts.forEach(o=>o.addEventListener('click',()=>{
+    if(answered[qi]!==-1)return;
+    const i=+o.dataset.i; answered[qi]=i;
+    opts[item.ans].classList.add('correct');
+    if(i!==item.ans)o.classList.add('wrong'); else score++;
+    document.getElementById('exp').classList.add('show');
+    document.getElementById('next').disabled=false;
+  }));
+  document.getElementById('next').addEventListener('click',()=>{qi++;renderQuiz();});
+}
+function renderScore(){
+  box.innerHTML=`<div class="score">
+    <div class="big">${score} / ${QUIZ.length}</div>
+    <p>${score===QUIZ.length?'满分，概念已经分得很清楚了 👏':score>=4?'不错，个别关系再回卡片看看即可':'建议回“概念卡片”和“关系图谱”再过一遍'}</p>
+    <div class="nav" style="justify-content:center;border:none">
+      <button id="again">重做一遍</button>
+    </div></div>`;
+  document.getElementById('again').addEventListener('click',()=>{qi=0;score=0;answered=Array(QUIZ.length).fill(-1);renderQuiz();});
+}
+renderQuiz();
+</script>
+</body>
+</html>
